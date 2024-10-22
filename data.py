@@ -76,7 +76,7 @@ class KSSDatasets(Dataset):
 def collate_fn(batch):
 
     # Puts each data field into a tensor with outer dimension batch size
-    if isinstance(batch[0], collections.Mapping):
+    if isinstance(batch[0], collections.abc.Mapping):
         keys = list()
 
         text = [d['text'] for d in batch]

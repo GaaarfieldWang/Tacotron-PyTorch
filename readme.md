@@ -8,7 +8,7 @@ Published in INTERSPEECH 2017
 
 ## Requirement
 
-python 3.8
+python 3.10
 ```sh
 pip install -r requirements.txt
 ```

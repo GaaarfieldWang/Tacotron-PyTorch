@@ -1,7 +1,5 @@
 tqdm
 numpy
-torch
-tensorboard
 falcon
 inflect
 librosa
@@ -9,3 +7,6 @@ scipy
 Unidecode
 pandas
 jamo
+torch
+tensorboard
+tensorflow

@@ -5,6 +5,7 @@ import numpy as np
 import argparse
 import os
 import time
+import datetime
 import torch
 import io
 import torch.nn as nn
@@ -51,8 +52,8 @@ def main(args):
     # Get dataset
     dataset = get_dataset()
     dataloader = DataLoader(dataset, batch_size=args.batch_size,
-                                shuffle=True, collate_fn=collate_fn, drop_last=True, num_workers=8)
-    print(f'len of dataset: {len(dataloader)}')
+                                shuffle=True, collate_fn=collate_fn, drop_last=True, num_workers=4)
+    print(f'len of dataset: {len(dataset)}, len of dataloader: {len(dataloader)}')
     # Construct model
     device = torch.device('cuda:0')
     
@@ -87,7 +88,7 @@ def main(args):
         os.mkdir(hp.output_path)
         
     # Tensorboard
-    writer = SummaryWriter('runs/tacotron')
+    writer = SummaryWriter(f'runs/tacotron{datetime.datetime.now().strftime("%Y%m%d-%H%M%S")}')
     
     sentences = [
     'Scientists at the CERN laboratory say they have discovered a new particle.', 
@@ -104,6 +105,7 @@ def main(args):
     for epoch in range(hp.epochs):
         print(f"Epoch: {epoch+1}")
         for i, data in tqdm(enumerate(dataloader)):
+            # data = np.array (32, 331), (32, 1024, 805), (32, 80, 805)
             current_step = i + args.restore_step + epoch * len(dataloader) + 1
 
             optimizer.zero_grad()
