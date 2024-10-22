@@ -1,5 +1,6 @@
 __pycache__/
 DataSet/
 model_new/
-my_results/
+my_result/
 .vscode/
+runs/

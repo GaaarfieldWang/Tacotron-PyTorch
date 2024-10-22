@@ -155,6 +155,11 @@ def main(args):
                 
                 model = model.train()
 
+                save_checkpoint({'model':model.state_dict(),
+                                 'optimizer':optimizer.state_dict()},
+                                os.path.join(hp.checkpoint_path,'checkpoint_%d.pth.tar' % current_step))
+                print("save model at step %d ..." % current_step)
+
             if current_step % hp.log_step == 0:
                 print("time per step: %.2f sec" % time_per_step)
                 print("At timestep %d" % current_step)
@@ -166,11 +171,6 @@ def main(args):
                 writer.add_scalar('train_linear_loss', linear_loss.item(), current_step)
                 writer.add_scalar('train_loss', loss.item(), current_step)
                 
-            if current_step % hp.save_step == 0:
-                save_checkpoint({'model':model.state_dict(),
-                                 'optimizer':optimizer.state_dict()},
-                                os.path.join(hp.checkpoint_path,'checkpoint_%d.pth.tar' % current_step))
-                print("save model at step %d ..." % current_step)
 
             if current_step in hp.decay_step:
                 optimizer = adjust_learning_rate(optimizer, current_step)
