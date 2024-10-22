@@ -12,10 +12,11 @@ from text.symbols import symbols, en_symbols
 import hyperparams as hp
 from text import text_to_sequence
 from torch.utils.tensorboard import SummaryWriter
+from tqdm import tqdm
 
 
 
-def generate(model, text, device, writer, curr, _tt):
+def generate(model, text, device, writer, curr, _tt, path):
 
     # Text to index sequence
     cleaner_names = [x.strip() for x in hp.cleaners.split(',')]
@@ -39,18 +40,19 @@ def generate(model, text, device, writer, curr, _tt):
     wav_tensor = torch.Tensor(wav).to(device).view(1, -1)
 
     writer.add_audio('audio_result_%02d'%(_tt), wav_tensor, curr, hp.sample_rate)
+
+    save_wav(wav, path)
     
-    out = io.BytesIO()
-    save_wav(wav, out)
-    
-    return out.getvalue()
+    return 
 
 
 def main(args):
 
     # Get dataset
     dataset = get_dataset()
-    
+    dataloader = DataLoader(dataset, batch_size=args.batch_size,
+                                shuffle=True, collate_fn=collate_fn, drop_last=True, num_workers=8)
+    print(f'len of dataset: {len(dataloader)}')
     # Construct model
     device = torch.device('cuda:0')
     
@@ -100,12 +102,8 @@ def main(args):
     n_priority_freq = int(3000 / (hp.sample_rate * 0.5) * hp.num_freq)
     
     for epoch in range(hp.epochs):
-
-        dataloader = DataLoader(dataset, batch_size=args.batch_size,
-                                shuffle=True, collate_fn=collate_fn, drop_last=True, num_workers=8)
-
-        for i, data in enumerate(dataloader):
-
+        print(f"Epoch: {epoch+1}")
+        for i, data in tqdm(enumerate(dataloader)):
             current_step = i + args.restore_step + epoch * len(dataloader) + 1
 
             optimizer.zero_grad()
@@ -140,7 +138,7 @@ def main(args):
             loss.backward()
 
             # clipping gradients
-            nn.utils.clip_grad_norm(model.parameters(), 1.)
+            nn.utils.clip_grad_norm_(model.parameters(), 1.)
 
             # Update weights
             optimizer.step()
@@ -151,13 +149,9 @@ def main(args):
                 model = model.eval()
                 
                 for _t, text in enumerate(sentences):
-                    wav = generate(model, text, device, writer, current_step, _t)
                     path = os.path.join(hp.output_path, 'result_%d_%d.wav' % (current_step, _t+1))
-                    with open(path, 'wb') as f:
-                        f.write(wav)
-
-                    f.close()
-                    print("save wav file at step %d ..." % (current_step))
+                    generate(model, text, device, writer, current_step, _t, path)
+                    # print("save wav file at step %d ..." % (current_step))
                 
                 model = model.train()
 

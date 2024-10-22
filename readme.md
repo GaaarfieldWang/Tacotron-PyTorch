@@ -7,14 +7,12 @@ An implementation of Tacotron described in the paper using pytorch.
 Published in INTERSPEECH 2017
 
 ## Requirement
-- torch 1.3.0
-- falcon 1.2.0
-- inflect 0.2.5
-- librosa 0.5.1
-- numpy 1.13.3
-- scipy 1.0.0
-- Unidecode 0.4.21
-- pandas 0.21.0
+
+python 3.8
+```sh
+pip install -r requirements.txt
+```
+
 
 ## Datasets
 - [LJ-Speech](https://keithito.com/LJ-Speech-Dataset/)

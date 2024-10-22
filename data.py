@@ -7,6 +7,7 @@ import numpy as np
 from text import text_to_sequence
 import collections
 from scipy import signal
+import soundfile as sf
 
 
 
@@ -22,6 +23,14 @@ class LJDatasets(Dataset):
         """
         self.landmarks_frame = pd.read_csv(csv_file, sep='|', header=None)
         self.root_dir = root_dir
+        self.data = []
+
+        for idx in range(len(self.landmarks_frame)):
+            wav_name = os.path.join(root_dir, self.landmarks_frame.loc[idx, 0]) + '.wav'
+            text = self.landmarks_frame.loc[idx, 1]
+            text = np.asarray(text_to_sequence(text), dtype=np.int32)
+            wav = np.asarray(self.load_wav(wav_name)[0], dtype=np.float32)
+            self.data.append({'text': text, 'wav': wav})
 
     def load_wav(self, filename):
         return librosa.load(filename, sr=hp.sample_rate)
@@ -30,13 +39,13 @@ class LJDatasets(Dataset):
         return len(self.landmarks_frame)
 
     def __getitem__(self, idx):
-        wav_name = os.path.join(self.root_dir, self.landmarks_frame.ix[idx, 0]) + '.wav'
-        text = self.landmarks_frame.ix[idx, 1]
-        text = np.asarray(text_to_sequence(text), dtype=np.int32)
-        wav = np.asarray(self.load_wav(wav_name)[0], dtype=np.float32)
-        sample = {'text': text, 'wav': wav}
+        # wav_name = os.path.join(self.root_dir, self.landmarks_frame.loc[idx, 0]) + '.wav'
+        # text = self.landmarks_frame.loc[idx, 1]
+        # text = np.asarray(text_to_sequence(text), dtype=np.int32)
+        # wav = np.asarray(self.load_wav(wav_name)[0], dtype=np.float32)
+        # sample = {'text': text, 'wav': wav}
 
-        return sample
+        return self.data[idx]
 
 class KSSDatasets(Dataset):
     '''Korean Single Speaker Speech dataset'''
@@ -98,7 +107,8 @@ _mel_basis = None
 
 def save_wav(wav, path):
   wav *= 32767 / max(0.01, np.max(np.abs(wav)))
-  librosa.output.write_wav(path, wav.astype(np.int16), hp.sample_rate)
+#   librosa.output.write_wav(path, wav.astype(np.int16), hp.sample_rate)
+  sf.write(path, wav.astype(np.int16), hp.sample_rate)
 
 
 def _linear_to_mel(spectrogram):
@@ -157,7 +167,7 @@ def _griffin_lim(S):
     Based on https://github.com/librosa/librosa/issues/434
     '''
     angles = np.exp(2j * np.pi * np.random.rand(*S.shape))
-    S_complex = np.abs(S).astype(np.complex)
+    S_complex = np.abs(S).astype(np.complex128)
     y = _istft(S_complex * angles)
     for i in range(hp.griffin_lim_iters):
         angles = np.exp(1j * np.angle(_stft(y)))

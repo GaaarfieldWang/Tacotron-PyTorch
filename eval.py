@@ -54,14 +54,8 @@ def main(args):
         linear_output = torch.transpose(linear_output, 1, 2)
         wav = inv_spectrogram(linear_output[0].data.cpu().numpy())
         _wav = wav[:find_endpoint(wav)]
-        out = io.BytesIO()
-        save_wav(_wav, out)
-        
-        tt = out.getvalue()
-
-        f = open('./result_%02d.wav'%i, 'wb')
-        f.write(tt)
-        f.close()
+        path = './result_%02d.wav'%i
+        save_wav(_wav, path)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

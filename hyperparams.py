@@ -27,6 +27,6 @@ cleaners='english_cleaners'  # 'korean_cleaners'   or 'english_cleaners'
 
 
 dataset = 'LJSpeech' # 'LJSpeech' or 'KSS'
-data_path = '../dataSet/LJSpeech-1.1'
-output_path = './result'
+data_path = './DataSet/LJSpeech-1.1'
+output_path = './my_result'
 checkpoint_path = './model_new'
