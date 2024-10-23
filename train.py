@@ -1,9 +1,15 @@
+import os
+os.environ["OMP_NUM_THREADS"] = "1"
+os.environ["OPENBLAS_NUM_THREADS"] = "1"
+os.environ["MKL_NUM_THREADS"] = "1"
+os.environ["VECLIB_MAXIMUM_THREADS"] = "1"
+os.environ["NUMEXPR_NUM_THREADS"] = "1"
+
 from network import Tacotron
 from data import get_dataset, DataLoader, collate_fn, get_param_size, inv_spectrogram, find_endpoint, save_wav, spectrogram
 from torch import optim
 import numpy as np
 import argparse
-import os
 import time
 import datetime
 import torch
@@ -102,9 +108,9 @@ def main(args):
     # Loss for frequency of human register
     n_priority_freq = int(3000 / (hp.sample_rate * 0.5) * hp.num_freq)
     
-    for epoch in range(hp.epochs):
-        print(f"Epoch: {epoch+1}")
-        for i, data in tqdm(enumerate(dataloader)):
+    for epoch in tqdm(range(hp.epochs)):
+        # for i, data in tqdm(enumerate(dataloader)):
+        for i, data in enumerate(dataloader):
             # data = np.array (32, 331), (32, 1024, 805), (32, 80, 805)
             current_step = i + args.restore_step + epoch * len(dataloader) + 1
 
@@ -163,10 +169,10 @@ def main(args):
                 print("save model at step %d ..." % current_step)
 
             if current_step % hp.log_step == 0:
-                print("time per step: %.2f sec" % time_per_step)
-                print("At timestep %d" % current_step)
-                print("linear loss: %.4f" % linear_loss.item())
-                print("mel loss: %.4f" % mel_loss.item())
+                print("time per step: %.2f sec" % time_per_step, end=', ')
+                print("At timestep %d" % current_step, end=', ')
+                print("linear loss: %.4f" % linear_loss.item(), end=', ')
+                print("mel loss: %.4f" % mel_loss.item(), end=', ')
                 print("total loss: %.4f" % loss.item())
                 
                 writer.add_scalar('train_mel_loss', mel_loss.item(), current_step)
