@@ -4,3 +4,4 @@ model_new/
 my_result/
 .vscode/
 runs/
+nohup.out
