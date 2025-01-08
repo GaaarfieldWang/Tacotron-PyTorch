@@ -28,10 +28,14 @@ def main(args):
     model = model.eval()
     
     sentences = [
-    'Scientists at the CERN laboratory say they have discovered a new particle.', 
-    'President Trump met with other leaders at the Group of 20 conference.',
-    'Generative adversarial network or variational auto-encoder.',
-    'Does the quick brown fox jump over the lazy dog?'
+    'Hello, world!', 
+    'Let\'s speak English!',
+    'We Wish You a Merry Christmas.',
+    '''
+Once upon a time...a little girl tried to make a living by selling  matches in the street.
+
+It was New Year's Eve and the snow-clad streets were deserted. From brightly lit windows came the tinkle of laughter and the sound of singing. People were getting ready to bring in the New Year. But the poor little matchseller sat sadly beside the fountain. Her ragged dress and worn shawl did not keep out the cold and she tried tokeep her bare feet from touching the frozen ground.
+''',
     ]
 
     # Text to index sequence
